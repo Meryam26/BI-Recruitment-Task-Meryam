@@ -4,10 +4,17 @@ up:
 	docker compose up -d
 
 down:
-	dockerc compose down
+	docker compose down
+
+dbt-seed:
+	docker compose run dbt seed
+
+dbt-run:
+	docker compose run dbt run
 
 dbt-build:
 	docker compose run dbt build
 
 dbt-compile:
 	docker compose run dbt compile
+

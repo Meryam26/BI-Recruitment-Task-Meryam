@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: raw_finance
+    database: recruitment_task
+    schema: raw_finance
+    tables:
+      - name: invoice
+        description: "Source table containing raw invoice data"
+
+models:
+  - name: invoice
+    description: "Parsed invoice data from the finance schema"
+    columns:
+      - name: invoice_id
+        description: "Unique identifier for each invoice"
+      - name: invoice_date
+        description: "Invoice date"
+      - name: currency
+        description: "Currency code for the invoice amount"
+      - name: amount
+        description: "Invoice amount"
+      - name: department
+        description: "Department responsible for the invoice"
+      - name: comment
+        description: "Comment or description associated with the invoice"
+

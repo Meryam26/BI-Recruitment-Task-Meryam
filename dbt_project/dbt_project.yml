@@ -1,36 +1,68 @@
-
-# Name your project! Project names should contain only lowercase characters
-# and underscores. A good package name should reflect your organization's
-# name or the intended use of these models
 name: 'dbt_project'
 version: '1.0.0'
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'dbt_project'
 
-# These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["seeds"]
+seed-paths: ["seeds/raw_data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-clean-targets:         # directories to be removed by `dbt clean`
+clean-targets:         
   - "target"
   - "dbt_packages"
 
-
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
-
-# In this example config, we tell dbt to build all models in the example/
-# directory as views. These settings can be overridden in the individual model
-# files using the `{{ config(...) }}` macro.
 models:
   dbt_project:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    refined:
+      +schema: refined_data
+      +materialized: table
+
+seeds:
+  dbt_project:     
+    schema: raw_data 
+    raw_github_issues:
+      +column_types:
+        _airbyte_unique_key: text
+        id: numeric
+        url: text
+        body: text
+        user: jsonb
+        draft: boolean
+        state: text
+        title: text
+        labels: jsonb
+        locked: boolean
+        number: numeric
+        node_id: text
+        user_id: numeric
+        assignee: jsonb
+        comments: numeric
+        html_url: text
+        assignees: jsonb
+        closed_at: timestamp with time zone
+        milestone: jsonb
+        reactions: jsonb
+        created_at: timestamp with time zone
+        events_url: text
+        labels_url: text
+        repository: text
+        updated_at: timestamp with time zone
+        comments_url: text
+        pull_request: jsonb
+        state_reason: text
+        timeline_url: text
+        repository_url: text
+        active_lock_reason: text
+        author_association: text
+        performed_via_github_app: jsonb
+        _airbyte_ab_id: character varying
+        _airbyte_emitted_at: timestamp with time zone
+        _airbyte_normalized_at: timestamp with time zone
+        _airbyte_issues_hashid: text
+
+    raw_finance_invoice:
+      +column_types:
+        payload: text

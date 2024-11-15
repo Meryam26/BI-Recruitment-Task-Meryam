@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: raw_data
+    description: "Schema containing raw seed data loaded from CSV files"
+    schema: dev_raw_data
+
+    tables:
+      - name: raw_currency_rate
+        description: "currency data"
+
+      - name: raw_finance_invoice
+        description: "Raw data containing finance invoice details"
+
+      - name: raw_github_issues
+        description: "Raw data of GitHub issues with metadata such as state, title, labels, etc."

@@ -1,57 +1,83 @@
-# BI Recruitment Task
+# BI Recruitment Task Solution
 
-This repo provide a set of preconfigured tools that can be used for the recruitment task for IFT:
+This repository contains my solution for the BI recruitment task for IFT.
 
-* PostgreSQL database
-* DBT
-* Grafana
+![Repartition of issues Dashbaord](media/screen-recording1.mp4)
 
-## Tasks
-
-One goal of the BI team is to design and implement dashboards to help Projects Lead have an overview of their project.
-Those dashboards will be use for the progress reporting, evaluating the project adoption, and identify improvment.
-
-In the Database, you will find data extracted from one of our [Github Project](https://github.com/waku-org/) and wake financial data. With those, create some indicators concerning:
-* The repartition of the issues.
-* The activity on different repos.
-* The Cost of the project.
-
-The github data are base on the project [Waku](https://github.com/waku-org/).
-
-The database configuration:
-* host: `recruitment.free.technology`
-* port: `5432`
-* user: will be provided
-* password: will be provided
-* database name: `recuitment_task`
-* schemas: `raw_github`,`raw_finance`
-
-This repo contain a preconfigured partial stack to let you focus on the data manipulation. However, you are free to use any free technology you like, on the condition we can easily reproduce the result.
+![Cost Management Overview Dashbaord](media/screenshot1.png)
 
 
-## Expectations
 
-We estimate the task you must spend on the task to be approximatively 5 hours, however we don't a full solution.
-If you send us a Proof of Concept with documentation to explain how you would continue the work is fine.
+## Changes Made
 
-With this task, our goals are to:
-* Understand your approch to a real problem.
-* Evaluate some keys skills (Data transformation, graph creation).
+1. **Centralized Data Locally**:
+   - I centralized raw and transformed data into a single local database to simplify processing and ensure consistency.
+   - Initially, I attempted to use a more straightforward method ( `pg_dump`) to extract data directly, but I lacked the necessary permissions to access table metadata.
+   - This led me to transfer data as CSV files and seed them into the local database using dbt.
+   - Configuring dbt to work with multiple sources and targets is not a straightforward or recommended process, as dbt assumes data should already be centralized for transformations.
 
-It is recommended to submit the tasks result as a git repository containing all the files to reproduce the result.
+2. **Transformations**:
+   - Focused on the `issues` and `invoice` tables.
+   - Flattened JSON structures and performed necessary transformations to both tables
+   - Added a currency table to convert invoice amounts to USD for consistent reporting.
 
-> If you are using this repo, we recommand that you export the grafana dashboard and add it with the dbt models to the git history.
+3. **Dashboards**:
+   - Created two Grafana dashboards (persisted under ./grafana/data/grafana.db)
+     1. **Issues Dashboard**: Visualizes issue distribution and repository activity.
+     2. **Cost Dashboard**: Displays project cost details.
+
+## How to Use
+
+**1.Clone the repository and navigate to the directory:**
+
+    ```bash
+    git clone <repo_url>
+    cd <repo_directory>
+    ```
+
+**2.Grant Docker write access to  grafana.db:**
+
+The file grafana.db is a database that I exported from my previous attempts. It already contains all the dashboards I created earlier. To ensure Docker can write to this file during runtime, you need to adjust the permissions:
+
+```bash
+ chmod 666  ./grafana/data/grafana.db
+ ```
+
+**3.  Set your environment variables:**
+    Open the .env file in the root directory and fill in the required values for the external database connection.
+
+**4.  Start the services (data transfer happens automatically):**
+
+    ```bash
+    make up
+    ```
+
+**4.  Seed the data into the database:**
+
+    ```bash
+    make dbt-seed
+    ```
+
+**5.  Run dbt models:**
+
+    ```bash
+    make dbt-run
+    ```
+
+6.  Access Grafana: http://localhost:3000 (default credentials: admin/Password!)
+
+7.  View the dashboards in Grafana.
 
 
-## Requirements
+## Improvements
 
-* Have docker installed
+1. **Streamline Data Extraction and Loading**:
+   - Implement a more elegant, automated process to extract and load data into a central data warehouse. This would streamline the workflow and ensure data is readily available for transformations.
 
-## Usage
+2. **Deeper Exploration of Data**:
+   - Spend additional time exploring all tables and their relationships to uncover more insights about interactions, labels, and other relevant data points. This would enable better normalization and data cleaning for higher-quality transformations.
 
-* Deploy the container with `make run`
-* Shutdown the containers with `make down`
-* Build the dbt models with `make dbt-buidlt`
-* Compile the dbt models with `make dbt-compile`
-
-The data from the database and grafana are persisted with docker volumes.
+3. **Enhance Dashboard Interactivity**:
+   - Design more interactive and insightful panels to improve data visualization. For example:
+     - A **stacked bar chart** could be used to compare the evolution of activity across repositories over time while also showing the percentage contribution of each repository.
+     - Add more granular filters to allow project leads to focus on specific metrics or timeframes.

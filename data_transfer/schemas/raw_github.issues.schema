@@ -1,0 +1,37 @@
+_airbyte_unique_key	text
+id	bigint
+url	text
+body	text
+"user"	jsonb
+draft	boolean
+state	text
+title	text
+labels	jsonb
+locked	boolean
+number	bigint
+node_id	text
+user_id	bigint
+assignee	jsonb
+comments	bigint
+html_url	text
+assignees	jsonb
+closed_at	timestamp with time zone
+milestone	jsonb
+reactions	jsonb
+created_at	timestamp with time zone
+events_url	text
+labels_url	text
+repository	text
+updated_at	timestamp with time zone
+comments_url	text
+pull_request	jsonb
+state_reason	text
+timeline_url	text
+repository_url	text
+active_lock_reason	text
+author_association	text
+performed_via_github_app	jsonb
+_airbyte_ab_id	character varying
+_airbyte_emitted_at	timestamp with time zone
+_airbyte_normalized_at	timestamp with time zone
+_airbyte_issues_hashid	text

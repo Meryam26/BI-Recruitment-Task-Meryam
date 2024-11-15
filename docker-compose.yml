@@ -1,11 +1,10 @@
----
 services:
   database:
     image: 'postgres:15'
     container_name: 'database'
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: Password
+      POSTGRES_DB: analytics_db
+      POSTGRES_PASSWORD: password
       POSTGRES_USER: admin
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
@@ -14,7 +13,7 @@ services:
     ports:
       - '5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d analytics_db" ]
       interval: 10s
       retries: 5
       start_period: 30s
@@ -22,8 +21,7 @@ services:
 
   dbt:
     container_name: dbt
-    image: ghcr.io/dbt-labs/dbt-postgres:1.7.2 #dbtlabs/dbt:latest  #dbt-dummy
-    build: dbt_project/
+    image: ghcr.io/dbt-labs/dbt-postgres:1.7.2
     volumes:
       - ./dbt_project:/usr/app/dbt
     ports:
@@ -32,21 +30,56 @@ services:
       DBT_PROFILES_DIR: /usr/app/dbt
       DBT_TARGET: dev
     depends_on:
-      - database
-    command: ["run"]
+      database:
+        condition: service_healthy
 
   grafana:
     image: 'grafana/grafana-enterprise'
     container_name: 'grafana'
     volumes:
-      - "grafana-data:/var/lib/grafana"
-      - "./grafana/grafana.ini:/etc/grafana/grafana.ini"
       - "./grafana/grafana-datasource-provisioning.yml:/etc/grafana/provisioning/datasources/postgres.yml"
+      - ./grafana/data/grafana.db:/var/lib/grafana/grafana.db
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+
     ports:
       - '3000:3000'
     depends_on:
       database:
         condition: service_healthy
 
+  data-transfer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      EXTERNAL_DB_HOST: ${EXTERNAL_DB_HOST}
+      EXTERNAL_DB_PORT: ${EXTERNAL_DB_PORT}
+      EXTERNAL_DB_USER: ${EXTERNAL_DB_USER}
+      EXTERNAL_DB_PASSWORD: ${EXTERNAL_DB_PASSWORD}
+      EXTERNAL_DB_NAME: ${EXTERNAL_DB_NAME}
+      LOCAL_DB_HOST: ${LOCAL_DB_HOST}
+      LOCAL_DB_PORT: ${LOCAL_DB_PORT}
+      LOCAL_DB_USER: ${LOCAL_DB_USER}
+      LOCAL_DB_PASSWORD: ${LOCAL_DB_PASSWORD}
+      LOCAL_DB_NAME: ${LOCAL_DB_NAME}
+      SCHEMAS: "raw_github raw_finance"
+    volumes:
+      - ./dbt_project:/usr/app/dbt
+      - ./data:/data
+    entrypoint: /usr/local/bin/transfer.sh
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "test", "-f", "/data/transfer_done" ]
+      interval: 5s
+      retries: 5
+      start_period: 10s
+      timeout: 2s
+    restart: 'no'
+
 volumes:
   grafana-data:
+  postgres_data:
+
+

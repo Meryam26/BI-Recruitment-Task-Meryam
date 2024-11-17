@@ -2,7 +2,9 @@
 
 This repository contains my solution for the BI recruitment task for IFT.
 
-![Repartition of issues Dashbaord](media/screen-recording1.mp4)
+
+https://github.com/user-attachments/assets/83bd5aa5-1f6a-45f1-afcd-338b32d71e19
+
 
 ![Cost Management Overview Dashbaord](media/screenshot1.png)
 
